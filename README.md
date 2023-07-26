@@ -127,7 +127,9 @@ Higher order functions are functions that either consume another function as inp
 
 #### Challenges faced
 
+- Overall this was a huge spike in difficulty compared to the last assignment, primarily due to all of the type conversion/data mapping needed to get the job done.
 - Combining lists using recursion was tricky for me. I first tried to push the elements into a temporary list, but the assignment doesn't allow using state like that, so I had to find another solution.
+- Getting the second part to work was very difficult. I eventually realised I needed to use the function I created in part 1 to get the job done. Thankfully this assignment isn't measured on performance/efficiency, because my solution was definitely not performant.
 
 #### Things I learned
 
@@ -143,4 +145,4 @@ fun combine-files(lst :: List<File>) -> List<String>:
 end
 ```
 
--
+- Through trial and error I figured out how to write my own `member` function, which I named as `contains`.
