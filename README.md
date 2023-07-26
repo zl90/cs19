@@ -146,3 +146,32 @@ end
 ```
 
 - Through trial and error I figured out how to write my own `member` function, which I named as `contains`.
+
+### Lecture 3: Sorting
+
+Question: What would the template look like for a list of numbers?
+My guess:
+
+```
+cases (List<Number>):
+  | empty
+  | link(val :: Number, rest :: List<Number>)
+end
+```
+
+Prof K's anwer:
+
+```
+fun flon(l :: List<Number>) -> Any
+  | empty => ...
+  | link(f :: Number, r :: List<Number>) => ...
+end
+```
+
+**What is a template?**
+
+- An attempt to extract as much code as we can out of the data definition, even before we know what problem we're trying to solve.
+- So the data definition can give us a bunch of information about how to solve issues surrounding the data type, and how to construct a function around the data type.
+- The template tells you "These are the pieces you can use to assemble a solution".
+
+This lecture blows my mind. I will need to watch this two or three times.
