@@ -128,6 +128,36 @@ where:
 end
 
 ## Part 2
+fun find-max(lor :: List<Recommendation>, acc :: Recommendation)-> Recommendation:
+  doc:"The largest recommendation in lor"
+  cases (List) lor:
+    | empty => acc
+    | link(f, r) =>
+      if f.count >= acc.count:
+        find-max(r, f)
+      else:
+        find-max(r, acc)
+      end
+  end
+end
 
+fun generate-bookpairs(records :: List<File>) -> Any:
+  doc: 'Gets a list of bookpairs from a list of files'
+  distinct-titles = sort(distinct(fold(lam(acc, curr): acc + curr.content end, empty, records)))
+  all-pairs = distinct-titles.map(lam(x): recommendation(recommend(x, records).count, recommend(x, records).content.map(lam(elt): pair(elt, x)end)) end)
+  all-pairs
+end
 
+fun popular-pairs(records :: List<File>) -> Recommendation<BookPair>:
+  doc: 'Takes a list of files and produces a recommendation with a list of BookPairs'
+  all-pairs = generate-bookpairs(records)
+  max-pair = find-max(all-pairs, recommendation(0, empty))
+  result = all-pairs.filter(lam(x): x.count == max-pair.count end)
+  dupe-pairs = result.foldl(lam(elt, acc): recommendation(max-pair.count, acc.content + elt.content) end, recommendation(0, empty))
+  recommendation(max-pair.count, 
+    dupe-pairs.content.foldl(lam(x, acc): 
+      if acc.member(pair(x.book2, x.book1)): acc + empty else: acc + [list: x] end end, empty))
+where:
+  popular-pairs([list: file('main.cpp', [list: 'aaa', 'bbb', 'ccc']), file('str.cpp', [list: 'aaa', 'bbb', 'ddd'])]) is recommendation(2, [list: pair('bbb', 'aaa')])
+end
 
