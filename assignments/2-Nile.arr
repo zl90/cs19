@@ -1,4 +1,6 @@
-## Assignment 2: Nile
+### Assignment 2: Nile
+
+## Part 1
 data File:
     | file(name :: String, content :: List<String>)
 end
@@ -92,6 +94,7 @@ where:
 end
 
 fun get-top-recommendations(lst :: List<BookCount>) -> List<BookCount>:
+  doc: 'Takes a list of BookCounts and returns a list of the ones with the highest count (aka: the most popular ones)'
   max-count = fold(lam(acc, curr): if curr.count > acc:
         curr.count
       else:
@@ -103,17 +106,28 @@ where:
   get-top-recommendations([list: bookcount("ddd", 1), bookcount("bbb", 2), bookcount("ccc", 1)]) is [list: bookcount('bbb', 2)]
 end
 
+fun map-data(lst :: List<BookCount>) -> Recommendation:
+  doc: 'Takes a list of BookCounts and maps them to a single Recommendation object'
+  fold(lam(acc, curr): recommendation(curr.count, link(curr.title, acc.content)) end, recommendation(0, empty), lst)
+where:
+  map-data([list: bookcount('bbb', 2), bookcount('nnn', 2)]) is recommendation(2, [list: 'nnn', 'bbb']) 
+end
+
 fun recommend(title :: String, book-records :: List<File>) -> Recommendation<String>:
   doc: 'Takes a book title and a list of Files and produces a Recommendation'
   filtered-files = filter-files(title, book-records)
   combined-files = combine-files(filtered-files, title)
   counted-recs = count-recommendations(combined-files, empty)
   top-recommendations = get-top-recommendations(counted-recs)
+  result = map-data(top-recommendations)
   
-  # now just need to map the data to the return type
-  # also need to document my function "get-top-recommendations"
-  recommendation(1, [list: 'bbb'])
+  result
 where:
-  recommend('aaa', [list: file('main.cpp', [list: 'aaa', 'bbb', 'ccc']), file('str.cpp', [list: 'aaa', 'bbb', 'ddd'])]) is recommendation(1, [list: 'bbb'])
+  recommend('aaa', [list: file('main.cpp', [list: 'aaa', 'bbb', 'ccc']), file('str.cpp', [list: 'aaa', 'bbb', 'ddd', 'ccc'])]) is recommendation(2, [list: 'bbb', 'ccc'])
   recommend('aaa', [list: file('main.cpp', [list: 'vvv', 'bbb', 'ccc']), file('str.cpp', [list: 'hhh', 'bbb', 'ddd'])]) is recommendation(0, [list:])
 end
+
+## Part 2
+
+
+
