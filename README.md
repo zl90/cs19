@@ -159,7 +159,7 @@ cases (List<Number>):
 end
 ```
 
-Prof K's anwer:
+Professor K's anwer:
 
 ```
 fun flon(l :: List<Number>) -> Any
@@ -175,3 +175,18 @@ end
 - The template tells you "These are the pieces you can use to assemble a solution".
 
 This lecture blows my mind. I will need to watch this two or three times.
+
+**Code Drills**
+
+- I drilled the 'insertion sort' coding exercise multiple times to make sure it sticks.
+- Doing this really helps me understand not only Pyret functions but Recursion in general.
+- The way Professor K breaks down each step in the process is genius!
+
+**The Pyret problem solving process**
+
+At each step, assess the following:
+
+- What are the possible cases? (ie: the empty/base case? The next item in the list?)
+- What do I need to return? (Look at your function template, this is free information!)
+- What do I currently have access to? (Function arguments? First item in the list? The rest of the list?)
+- How do I take what I already have and turn it into the correct return type?
