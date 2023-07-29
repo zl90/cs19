@@ -95,13 +95,44 @@ where:
     [list: person('b', 3), person('c', 3), person('a', 3)]) is false
 end
 
+fun is-string-list-equal(list1 :: List<String>, list2 :: List<String>) -> Boolean:
+  doc: 'Returns true if each index in two lists of Strings are the same'
+    cases (List) list1:
+    | empty => true
+    | link(f1, r1) =>
+      cases (List) list2:
+        | empty => true
+        | link(f2, r2) =>
+          if f1 == f2:
+            is-string-list-equal(r1, r2)
+          else:
+            false
+          end
+      end
+  end
+end
+
+fun is-names-equal(list1 :: List<Person>, list2 :: List<Person>) -> Boolean:
+  doc: 'Returns true if each index in two lists of `Person`s share the same `name` value'
+    
+  names1 = sort(list1.map(lam(x): x.name end))
+  names2 = sort(list2.map(lam(x): x.name end))
+  
+  is-string-list-equal(names1, names2)
+where:
+  is-names-equal([list: person('aaa', 3), person('asdf', 2), person('asdf', 1)],
+    [list: person('asdf', 1), person('asdf', 2), person('aaa', 3)]) is true
+  is-names-equal([list: person('ag', 1), person('asdf', 2), person('asdf', 3)],
+    [list: person('asdf', 1), person('asdf', 2), person('asdf', 3)]) is false
+end
+
 fun is-valid(list1 :: List<Person>, list2 :: List<Person>) -> Boolean:
   doc: 'Returns true if the 2nd input is a sorted version of the 1st input, false otherwise'
   if (list1 == empty) or (list2 == empty) or not(length(list1) == length(list2)):
     false
   else:
     list1-sorted = insertion-sort(list1)
-    is-ages-equal(list1-sorted, list2)
+    is-ages-equal(list1-sorted, list2) and is-names-equal(list1-sorted, list2)
   end
 where:
   is-valid([list: person('asdf', 3), person('asdf', 2), person('asdf', 1)],
