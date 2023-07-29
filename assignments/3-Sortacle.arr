@@ -126,13 +126,35 @@ where:
     [list: person('asdf', 1), person('asdf', 2), person('asdf', 3)]) is false
 end
 
+fun all-elements-exist-in-both(list1 :: List<Person>, list2 :: List<Person>) -> Boolean:
+  doc: 'Returns true if each element in `list1` exists in `list2`, regardless of order'
+  cases (List) list1:
+    | empty => true
+    | link(f, r) =>
+      block:
+        found = list2.find(lam(x): (x.name == f.name) and (x.age == f.age) end)
+        if found == none:
+          false
+        else:
+          all-elements-exist-in-both(r, list2)
+        end
+      end
+  end
+where:
+  all-elements-exist-in-both([list: person('asdf', 3), person('asdf', 2), person('asdf', 1)],
+    [list: person('asdf', 1), person('asdf', 2), person('asdf', 3)]) is true
+  all-elements-exist-in-both([list: person('asdf', 3), person('asdf', 2), person('asdf', 1)],
+    [list: person('asdf', 1), person('asdf', 2), person('ddd', 3)]) is false
+end
+
 fun is-valid(list1 :: List<Person>, list2 :: List<Person>) -> Boolean:
   doc: 'Returns true if the 2nd input is a sorted version of the 1st input, false otherwise'
   if (list1 == empty) or (list2 == empty) or not(length(list1) == length(list2)):
     false
   else:
     list1-sorted = insertion-sort(list1)
-    is-ages-equal(list1-sorted, list2) and is-names-equal(list1-sorted, list2)
+    is-ages-equal(list1-sorted, list2) and is-names-equal(list1-sorted, list2) and
+    all-elements-exist-in-both(list1-sorted, list2)
   end
 where:
   is-valid([list: person('asdf', 3), person('asdf', 2), person('asdf', 1)],
@@ -142,5 +164,7 @@ where:
   is-valid([list: person('a', 3)], [list: person('a', 3), person('b', 4)]) is false
   is-valid([list: person('a', 3)], [list: ]) is false
   is-valid([list: ], [list: ]) is false # Empty lists can't be sorted, so this is not valid
+  is-valid([list: person('a', 1), person('b', 1), person('c', 2), person('d', 3)],
+    [list: person('b', 1), person('a', 1), person('d', 3), person('c', 2), ]) is false
 end
 
