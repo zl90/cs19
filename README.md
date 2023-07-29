@@ -190,3 +190,15 @@ At each step, assess the following:
 - What do I need to return? (Look at your function template, this is free information!)
 - What do I currently have access to? (Function arguments? First item in the list? The rest of the list?)
 - How do I take what I already have and turn it into the correct return type?
+
+### Assignment 3: Testing Oracle
+
+#### Challenges faced
+
+- The most difficult part of this assignment was accounting for all the edge cases when sorting a list of objects. There could be many different permutations of different sorted lists which are all valid. I believe I caught them all by drawing out many examples on paper.
+
+#### Things I learned
+
+- I learned what a testing oracle is (testing whether the output has the right relationship with the input).
+- I also learned what Property Based Testing is (eg: generating random input data to test a wide range of properties of the code, great for finding edge cases).
+- I'm really solidifying my ability to use recursion in Pyret.
