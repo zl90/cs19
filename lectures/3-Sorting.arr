@@ -10,12 +10,6 @@ fun insert(n :: Number, l :: List<Number>) -> List<Number>:
         link(f, insert(n, r))
       end
   end
-where:
-  insert(2,  [list: 3,4,5])   is [list: 2,3,4,5]
-  insert(1,  [list: 0,1,1,2]) is [list: 0,1,1,1,2]
-  insert(-1, [list: -2,0,3])  is [list: -2,-1,0,3]
-  insert(3,  [list: ])        is [list: 3]
-  insert(4,  [list: 1,2,3])   is [list: 1,2,3,4]
 end
 
 fun my-sort(l :: List<Number>) -> List<Number>:
@@ -23,7 +17,14 @@ fun my-sort(l :: List<Number>) -> List<Number>:
     | empty => empty
     | link(f, r) => insert(f, sort(r))
   end
-where:
+end
+
+check:
+  insert(2,  [list: 3,4,5])   is [list: 2,3,4,5]
+  insert(1,  [list: 0,1,1,2]) is [list: 0,1,1,1,2]
+  insert(-1, [list: -2,0,3])  is [list: -2,-1,0,3]
+  insert(3,  [list: ])        is [list: 3]
+  insert(4,  [list: 1,2,3])   is [list: 1,2,3,4]
   my-sort([list: 3,2,1])        is [list: 1,2,3]
   my-sort([list: 1,2,3])        is [list: 1,2,3] 
   my-sort([list: 4,1,-1])       is [list: -1, 1, 4]
