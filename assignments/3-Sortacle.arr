@@ -168,3 +168,48 @@ where:
     [list: person('b', 1), person('a', 1), person('d', 3), person('c', 2), ]) is false
 end
 
+## Task 3: Using is-valid and generate-input, write a function that tests whether an algorithm is a
+## valid sorter:
+
+# This function was given by the assignment specification:
+fun correct-sorter(people :: List<Person>) -> List<Person>:
+  doc: ```Consumes a list of people and produces a list of people
+       that are sorted by age in ascending order.```
+  sort-by(people,
+    lam(p1, p2): p1.age < p2.age end,
+    lam(p1, p2): p1.age == p2.age end)
+where:
+  mlitt2 = person("Michael", 18)
+  msantoma = person("Mia", 65)
+  zwegweis = person("Zak", 32)
+  correct-sorter(empty) is empty
+  correct-sorter([list: msantoma]) is [list: msantoma]
+  correct-sorter([list: msantoma, mlitt2]) is [list: mlitt2, msantoma]
+  correct-sorter([list: mlitt2, msantoma]) is [list: mlitt2, msantoma]
+  correct-sorter([list: mlitt2, msantoma, zwegweis])
+    is [list: mlitt2, zwegweis, msantoma]
+end
+
+fun incorrect-sorter(people :: List<Person>) -> List<Person>:
+  doc: ```Consumes a list of people and produces a list of people
+       that are sorted incorrectly by age in ascending order.```
+  people
+end
+
+fun oracle(sorting-func :: (List<Person> -> List<Person>)) -> Boolean:
+  doc: 'Returns true if the input function is a valid sorting algorithm for Lists of `Person`s'
+  random-data = generate-input(num-random(20))
+  correctly-sorted-data = correct-sorter(random-data)
+  test-sorted-data = sorting-func(random-data)
+  
+  result = is-ages-equal(test-sorted-data, correctly-sorted-data) and 
+  is-names-equal(test-sorted-data, correctly-sorted-data) and
+  all-elements-exist-in-both(test-sorted-data, correctly-sorted-data)
+  
+  result
+  
+where:
+  oracle(correct-sorter) is true
+  oracle(insertion-sort) is true
+  oracle(incorrect-sorter) is false
+end
