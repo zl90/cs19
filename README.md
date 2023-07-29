@@ -202,3 +202,7 @@ At each step, assess the following:
 - I learned what a testing oracle is (testing whether the output has the right relationship with the input).
 - I also learned what Property Based Testing is (eg: generating random input data to test a wide range of properties of the code, great for finding edge cases).
 - I'm really solidifying my ability to use recursion in Pyret.
+
+### Lecture 4: Big O
+
+**Code kata for later:** Write the `length()` function using recursion in Pyret.
