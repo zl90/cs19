@@ -30,3 +30,18 @@ check:
   my-sort([list: 4,1,-1])       is [list: -1, 1, 4]
   my-sort([list: 0.1, 0, 0.11]) is [list: 0, 0.1, 0.11]
 end
+
+## Lets step through this function:
+## Lets call: my-sort([list: 3,2,1])
+
+# -> insert(3, my-sort([list: 2, 1]))
+# --> my-sort([list: 2, 1])
+# ---> insert(2, my-sort([list: 1]))
+# ----> my-sort([list: 1])
+# -----> insert(1, [list: ])
+# ----> [list: 1]
+# ---> [list: 1, 2]
+# --> [list: 1, 2, 3]
+
+## another way to look at it:
+# insert(3, insert(2, insert(1, [list: ])))
