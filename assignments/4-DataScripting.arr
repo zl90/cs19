@@ -49,4 +49,39 @@ where:
   sum-largest([list: [list: 1, 7, 5, 3], [list: 20], [list: 6, 9]]) is (7 + 20 + 9)
 end
 
+### Task 3: Design a program called adding-machine that consumes a list of numbers and produces a list of the sums of each non-empty sublist separated by zeros. Ignore input elements that occur after the first occurrence of two consecutive zeros.
 
+fun my-fold(l :: List<Number>, acc :: List<Number>, index :: Number) -> List<Number>:
+  cases (List) l:
+    | empty => acc
+    | link(f, r) =>
+      if f == 0:
+        # Check whether the next number is zero. If so, return the accumulator, because we are done. If not, add a new entry to the accumulator.
+        cases (List) r:
+          | empty => acc
+          | link(f2, r2) => 
+            if f2 == 0:
+              acc
+            else:
+              my-fold(r, acc + [list: f], index + 1)
+            end
+        end
+      else:
+        # Add the first element of the list to the last element of the accumulator.
+          if (acc.length() > 0):
+            my-fold(r, set(acc, index, acc.last() + f), index)
+          else:
+            my-fold(r, [list: f], index)
+          end
+      end
+  end
+end
+
+fun adding-machine(l :: List<Number>) -> List<Number>:
+  doc: 'Consumes a list of numbers and produces a list of the sums of each non-empty sublist separated by zeros'
+  my-fold(l, empty, 0)
+where:
+  adding-machine([list: 1, 2, 0, 7, 0, 5, 4, 1, 0, 0, 6]) is [list: 3, 7, 10]
+  adding-machine([list: 1, 0, 0]) is [list: 1]
+  adding-machine([list: 0, 0, 0]) is [list: ]
+end
