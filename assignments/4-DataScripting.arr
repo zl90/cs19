@@ -157,3 +157,17 @@ fun data-smooth(phrs :: List<PHR>) -> List<Number>:
 where:
   data-smooth([list: phr("eugene", 2, 60, 77), phr("matty", 1.55, 58.17, 56 ), phr("ray", 1.8, 55, 84), phr("mike", 1.5, 100, 64)]) is [list: 77, (77 + 56 + 84) / 3, (56 + 84 + 64) / 3, 64]
 end
+
+# Task 6: Most Frequent Words.
+# Given a list of strings, design a function frequent-words that produces a list containing the three strings that occur most frequently in the input list.
+
+fun frequent-words(words :: List<String>) -> List<String>:
+  doc: 'Consumes a list of strings and produces a list containing the three strings that occur the most frequently in the input list'
+  # Ideas:
+  # - sort the list then do a custom fold over it, accumulating the return list, the current word, the current count and the current max count? O(nlogn).
+  # - use a list of custom data type like name-count(name :: String, count :: Number), sort the list by count, take the first 3 elements, check for same counts, then sort by name length. O(nlogn).
+  # this would be very easy with a hash map... O(n).
+where:
+  frequent-words([list: "silver", "james", "james", "silver", "howlett", "silver", "loganne", "james", "loganne"]) is  [list: "james", "silver", "loganne"]
+end
+
