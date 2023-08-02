@@ -56,7 +56,7 @@ fun my-fold(l :: List<Number>, acc :: List<Number>, index :: Number) -> List<Num
     | empty => acc
     | link(f, r) =>
       if f == 0:
-        # Check whether the next number is zero. If so, return the accumulator, because we are done. If not, add a new entry to the accumulator.
+        # Check whether the next number in the list is zero. If so, return the accumulator, because we are done. If not, add a new entry to the accumulator.
         cases (List) r:
           | empty => acc
           | link(f2, r2) => 
@@ -84,4 +84,45 @@ where:
   adding-machine([list: 1, 2, 0, 7, 0, 5, 4, 1, 0, 0, 6]) is [list: 3, 7, 10]
   adding-machine([list: 1, 0, 0]) is [list: 1]
   adding-machine([list: 0, 0, 0]) is [list: ]
+end
+
+### Task 4: The BMI sorter. 
+
+data PHR:
+  | phr(name :: String,
+      height :: Number,
+      weight :: Number,
+      heart-rate :: Number)
+end
+    
+data Report:
+  | bmi-summary(under :: List<String>,
+      healthy :: List<String>,
+      over :: List<String>,
+      obese :: List<String>)
+end
+
+fun bmi-report(phrs :: List<PHR>) -> Report:
+  doc: 'Consumes a list of Personal Health Records and returns a BMI Report containing lists of names of patients and their BMI classification'
+  fold(lam(acc, patient):
+      block:
+        bmi = patient.weight / (patient.height * patient.height)
+        if bmi < 18.5:
+          bmi-summary(acc.under + [list: patient.name], acc.healthy, acc.over, acc.obese)
+        else if bmi < 25:
+          bmi-summary(acc.under, acc.healthy + [list: patient.name], acc.over, acc.obese)
+        else if bmi < 30:
+          bmi-summary(acc.under, acc.healthy, acc.over + [list: patient.name], acc.obese)
+        else:
+          bmi-summary(acc.under, acc.healthy, acc.over, acc.obese + [list: patient.name])
+        end
+      end
+    end, bmi-summary(empty, empty, empty, empty), phrs)
+where:
+  bmi-report([list: phr("eugene", 2, 60, 77), phr("matty", 1.55, 58.17, 56 ), phr("ray", 1.8, 55, 84), phr("mike", 1.5, 100, 64)]) is bmi-summary(
+  [list: "eugene", "ray"], # under
+  [list: "matty"],         # healthy
+  [list: ],                # over
+  [list: "mike"]           # obese
+)
 end
