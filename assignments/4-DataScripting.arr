@@ -126,3 +126,34 @@ where:
   [list: "mike"]           # obese
 )
 end
+
+### Task 5: Data smoothing.
+
+fun smoothing-fold(l :: List<PHR>, prev :: Option<Number>, acc :: List<Number>) -> List<Number>:
+  cases (List) l:
+    | empty => acc
+    | link(curr, r) =>
+      cases (Option) prev:
+        | none => 
+          # We're on the first element of the list. Just append it to the accumulator
+          smoothing-fold(r, some(curr.heart-rate), acc + [list: curr.heart-rate])
+        | some(previous) => 
+        # Get the next element
+        cases (List) r:
+          | empty => acc + [list: curr.heart-rate] # We are at the end of the list
+          | link(next, r2) => 
+            block:
+                average = (previous + curr.heart-rate + next.heart-rate) / 3
+                smoothing-fold(r, some(curr.heart-rate), acc + [list: average])
+            end
+        end
+      end
+  end
+end
+
+fun data-smooth(phrs :: List<PHR>) -> List<Number>:
+  doc: 'Consumes a list of personal health records and produces a list of the smoothed heart-rate values'
+  smoothing-fold(phrs, none, empty)
+where:
+  data-smooth([list: phr("eugene", 2, 60, 77), phr("matty", 1.55, 58.17, 56 ), phr("ray", 1.8, 55, 84), phr("mike", 1.5, 100, 64)]) is [list: 77, (77 + 56 + 84) / 3, (56 + 84 + 64) / 3, 64]
+end
