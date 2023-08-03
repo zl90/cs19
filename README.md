@@ -206,3 +206,16 @@ At each step, assess the following:
 ### Lecture 4: Big O
 
 **Code kata for later:** Write the `length()` function using recursion in Pyret.
+
+### Assignment 4: Data Scripting
+
+#### Challenges faced
+
+- Task 3: Adding machine. This was difficult because I had to use two accumulators in a recursive fold function. This is something I hadn't done before. After lots of trial and error, it occurred to me that I could use a second accumulator to keep track of an index needed for inserting an element into a list. In the future I will be re-attempting this question, because it didn't feel right to be inserting values into a list. A large part of Pyret is about breaking away from the imperative programming style and ideally not mutating state (which I technically didn't), and I believe this challenge is doable without using the `set()` function in Pyret.
+- Optimizing these algorithms isn't within my capabilities yet, I just don't have enough knowledge of the Pyret programming style/methodology. All my algorithms for this assignment have quadratic time complexity. Conversely, I could do most of these in O(n) using an imperative style in Typescript.
+- Task 7: Earthquake Monitoring. This was also difficult because it required me to use two accumulators and write my own fold function, however I made the mistake of rushing into the implementation without considering what data type I would need to use for my second accumulator, which led me down a wild goose chase, only to realise I wasn't accumulating with all the data I needed.
+
+#### Things I learned
+
+- I need to spend more time planning my implementation, especially when it comes to challenges with tricky/custom data types which need to be managed. Taking extra time to plan can save a lot of wasted time later on.
+- Thinking about how the data could be *reshaped* or *cleaned* was really helpful, especially for code readability and helping me figure out the problem.
