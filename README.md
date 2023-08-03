@@ -121,7 +121,7 @@ Higher order functions are functions that either consume another function as inp
 
 - Writing a function that requires iteration **without** using `map` or `for` loop was pretty tricky for me. I knew the problem required recursion, but figuring out what to actually return was the difficult part. It wasn't until I slowed down and really thought "Okay, what do I actually need to return? I need to return a list, and I currently have the first element and a link to the rest of the list... maybe if I return a list with the first element modified and THEN call recursion on the rest of the list!". This was a big learning moment for me, as I've never used recursion before.
 - Learned about Type Parameters. Still don't fully understand them, but I used them to implement my own map function. I couldn't find anything about them in the DCIC book but they are present in the language documentation. These are called **Generics** in Typescript! I've never used them before but I'm quickly getting used to them.
-- I learned that in Pyret you can nest the `cases` operation to iterate over two (or more) datum at the same time. Without this, implementing the `map2` function from scratch would have been impossible.
+- I learned that in Pyret you can nest the `cases` operation to iterate over two (or more) data structures at the same time. Without this, implementing the `map2` function from scratch would have been impossible.
 
 ### Assignment 2: Nile
 
