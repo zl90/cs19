@@ -161,12 +161,71 @@ end
 # Task 6: Most Frequent Words.
 # Given a list of strings, design a function frequent-words that produces a list containing the three strings that occur most frequently in the input list.
 
+data NameCount:
+  | name-count(name :: String, count :: Number) 
+end
+
+fun get-n(name :: String, l :: List<NameCount>, acc :: Number) -> Number:
+  doc: 'Searches a list of NameCounts for a specific name and returns the index of the name in the list. Raises an error if the index does not exist in the list.'
+  cases (List) l:
+    | empty => raise('Error: name is not in list')
+    | link(f, r) =>
+      if f.name == name:
+        acc
+      else:
+        get-n(name, r, acc + 1)
+      end
+  end
+where:
+  get-n('jerry', [list: name-count('fred', 5), name-count('jerry', 2)], 0) is 1
+  get-n('gene', [list: name-count('fred', 5), name-count('jerry', 2)], 0) raises 'Error: name is not in list'
+end
+
+fun name-count-contains(name :: String, l :: List<NameCount>) -> Boolean:
+  doc: 'Returns true if a name-count list contains an entry which matches the name, false otherwise'
+  cases (List) l:
+    | empty => false
+    | link(f, r) =>
+      if (f.name == name):
+        true
+      else:
+        name-count-contains(name, r)
+      end
+  end
+where:
+  name-count-contains('fred', [list: name-count('john', 2), name-count('fred', 2)]) is true
+  name-count-contains('fred', [list: name-count('john', 2), name-count('randy', 2)]) is false
+end
+
+fun increment(name :: String, l :: List<NameCount>, value :: Number) -> List<NameCount>:
+  doc: 'Searches the list for the entry that matches the name, then increments the count of that entry by the value'
+  if name-count-contains(name, l):
+    block:
+      index = get-n(name, l, 0)
+      result = set(l, index, name-count(name, get(l, index).count + value))
+      result
+    end
+  else:
+    l
+  end
+where:
+  increment('fred', [list: name-count('fred', 2)], 1) is [list: name-count('fred', 3)]
+  increment('fred', [list: name-count('george', 2)], 1) is [list: name-count('george', 2)]
+end
+
 fun frequent-words(words :: List<String>) -> List<String>:
   doc: 'Consumes a list of strings and produces a list containing the three strings that occur the most frequently in the input list'
-  # Ideas:
-  # - sort the list then do a custom fold over it, accumulating the return list, the current word, the current count and the current max count? O(nlogn).
-  # - use a list of custom data type like name-count(name :: String, count :: Number), sort the list by count, take the first 3 elements, check for same counts, then sort by name length. O(nlogn).
-  # this would be very easy with a hash map... O(n).
+  namecounts = fold(lam(acc, word):
+      if name-count-contains(word, acc):
+        increment(word, acc, 1)
+      else:
+        acc + [list: name-count(word, 1)]
+      end
+    end, empty, words)
+  sorted = sort-by(namecounts, lam(a, b): a.count > b.count end, lam(a, b): a.count == b.count  end)
+  topthree = sorted.take(3)
+  result = topthree.map(lam(x): x.name end)
+  result
 where:
   frequent-words([list: "silver", "james", "james", "silver", "howlett", "silver", "loganne", "james", "loganne"]) is  [list: "james", "silver", "loganne"]
 end
