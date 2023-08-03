@@ -230,3 +230,48 @@ where:
   frequent-words([list: "silver", "james", "james", "silver", "howlett", "silver", "loganne", "james", "loganne"]) is  [list: "james", "silver", "loganne"]
 end
 
+### Task 7: Earthquake Monitoring.
+data HzReport:
+  | max-hz(date :: Number, max-reading :: Number)
+end
+
+fun extract-month(num :: Number) -> Number:
+  doc: 'Given an 8 digit integer which represents a date (eg: 20220708), returns a 1 or 2 digit integer representing the month from the input integer'
+  modulo = num-modulo(num, 10000)
+  num-floor(modulo / 100)
+where:
+  extract-month(20150613) is 6
+  extract-month(20151213) is 12
+  extract-month(20150113) is 1
+end
+  
+fun fold-hz-data(l :: List<Number>, acc :: List<HzReport>, last-max-report :: HzReport) -> List<HzReport>:
+  doc: 'Folds over a list of seismic data and returns a sorted list of the max seismic reading per day'
+  cases (List) l:
+    | empty => acc
+    | link(f, r) => 
+      if f > 500:
+        fold-hz-data(r, acc + [list: max-hz(f, 0)], max-hz(f, 0))
+      else:
+        if last-max-report.max-reading < f:
+          if acc.length() > 0:
+            fold-hz-data(r, set(acc, acc.length() - 1, max-hz(last-max-report.date, f)), max-hz(last-max-report.date, f))
+          else:
+            fold-hz-data(r, [list: max-hz(last-max-report.date, f)], max-hz(last-max-report.date, f))
+          end
+        else:
+          fold-hz-data(r, acc, last-max-report)
+        end
+      end
+  end
+end
+
+fun daily-max-for-month(sensor-data :: List<Number>, month :: Number) -> List<HzReport>:
+  doc: 'Consumes a list of seismic data and returns a sorted list of the max seismic reading per day, for a specified month'
+  top-reports = fold-hz-data(sensor-data, empty, max-hz(sensor-data.get(0), 0))
+  reports-for-this-month = top-reports.filter(lam(x): extract-month(x.date) == month end)
+  
+  reports-for-this-month
+where:
+  daily-max-for-month([list: 20151004, 150, 200, 175, 20151005, 0.002, 0.03, 20151007, 130, 0.54, 20151101, 78], 10) is [list: max-hz(20151004, 200), max-hz(20151005, 0.03), max-hz(20151007, 130)]
+end
