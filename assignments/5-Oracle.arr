@@ -6,8 +6,8 @@ import shared-gdrive("oracle-support.arr",
   "11JjbUnU58ZJCXSphUEyIODD1YaDLAPLm") as O
 
 ##### PUT IMPORTS BELOW HERE ############
-import lists as L
-import equality as EQ
+
+
 ##### PUT IMPORTS ABOVE HERE ############
 
 type Hire = O.Hire
@@ -198,10 +198,11 @@ fun oracle(a-matchmaker :: (List<List<Number>>, List<List<Number>>
   Takes a purported matchmaking algorithm as input and outputs whether or
   not it always returns the correct response
   ```
-  companies = generate-input(5)
-  candidates = generate-input(5)
+  input-size = num-random(10)
+  companies = generate-input(input-size)
+  candidates = generate-input(input-size)
   hires = a-matchmaker(companies, candidates)
-  true
+  is-valid(companies, candidates, hires)
 where:
   oracle(matchmaker) is true
 end
