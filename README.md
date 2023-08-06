@@ -218,4 +218,10 @@ At each step, assess the following:
 #### Things I learned
 
 - I need to spend more time planning my implementation, especially when it comes to challenges with tricky/custom data types which need to be managed. Taking extra time to plan can save a lot of wasted time later on.
-- Thinking about how the data could be *reshaped* or *cleaned* was really helpful, especially for code readability and helping me figure out the problem.
+- Thinking about how the data could be _reshaped_ or _cleaned_ was really helpful, especially for code readability and helping me figure out the problem.
+
+### Assignment 5: Oracle
+
+#### Things I learned
+
+- This assignment further solidified my knowledge of _property based testing_. I learned to carefully consider what the _properties_ of the output data should be, rather than the _content_ of the output data. For example: the output list should contain no duplicate items, the output list should be the same length as the input list, and all the values in the output list should be in the correct range.
