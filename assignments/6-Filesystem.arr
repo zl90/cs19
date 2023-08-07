@@ -52,12 +52,35 @@ where:
 end
 
 #==========Exercise 2==========#
-#fun du-dir(a-dir :: Dir) -> Number:
-#  doc: ""
-#  ...
-#where:
-#  nothing
-#end
+fun du-files(files :: List<File>) -> Number:
+  doc: "Computes the total size of all the files from a list of files"
+  cases (List) files:
+    | empty => 0
+    | link(f, r) => 1 + f.size + du-files(r)
+  end
+where:
+  du-files(text.fs) is 171
+end
+
+fun du-dirs(dirs :: List<Dir>) -> Number:
+  doc: "Computes the total size of all the directories and files from a list of directories"
+  cases (List) dirs:
+    | empty => 0
+    | link(f, r) => 1 + du-files(f.fs) + du-dirs(f.ds) + du-dirs(r)
+  end
+where:
+  du-dirs([list: text]) is 171 + 1
+  du-dirs([list: TS]) is 219
+  du-dirs(empty) is 0
+end
+
+fun du-dir(a-dir :: Dir) -> Number:
+  doc: "Computes the total size of all the files and subdirectories of a directory tree"
+  du-files(a-dir.fs) + du-dirs(a-dir.ds)
+where:
+  du-dir(TS) is 218
+  du-dir(code) is 12
+end
 
 #==========Exercise 3==========#
 #fun can-find(a-dir :: Dir, fname :: String) -> Boolean:
