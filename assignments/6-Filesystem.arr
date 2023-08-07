@@ -83,12 +83,39 @@ where:
 end
 
 #==========Exercise 3==========#
-#fun can-find(a-dir :: Dir, fname :: String) -> Boolean:
-#  doc: ""
-#  ...
-#where:
-#  nothing
-#end
+fun is-in-files(files :: List<File>, fname :: String, acc :: Boolean) -> Boolean:
+  cases (List) files:
+    | empty => acc
+    | link(f, r) => 
+      if f.name == fname:
+        true
+      else:
+        is-in-files(r, fname, acc)
+      end
+  end
+end
+
+  fun is-in-child-dirs(dirs :: List<Dir>, fname :: String, acc :: Boolean) -> Boolean:
+  cases (List) dirs:
+    | empty => acc
+    | link(f, r) => 
+      if is-in-files(f.fs, fname, false) or is-in-child-dirs(f.ds, fname, false):
+          true
+      else:
+        is-in-child-dirs(r, fname, false)
+      end      
+  end
+end
+
+fun can-find(a-dir :: Dir, fname :: String) -> Boolean:
+  doc: "Determines whether or not a file with the input name can be found anywhere in that directory tree"
+  is-in-files(a-dir.fs, fname, false) or is-in-child-dirs(a-dir.ds, fname, false)
+where:
+  can-find(TS, 'hang') is true
+  can-find(TS, 'test') is false
+  can-find(libs, 'foo') is false
+  can-find(libs, 'read!') is true
+end
 
 #==========Exercise 4==========#
 #fun fynd(a-dir :: Dir, fname :: String) -> List<Path>:
