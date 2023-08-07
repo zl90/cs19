@@ -32,33 +32,45 @@ TS = dir('TS', [list: text, libs], [list: read2])
 
 
 #==========Exercise 1==========#
+fun count-child-dirs(dirs :: List<Dir>) -> Number:
+  doc: "Counts the number of files in a list of directories"
+  cases (List) dirs:
+    | empty => 0
+    | link(f, r) => f.fs.length() + count-child-dirs(f.ds) + count-child-dirs(r)
+  end
+where:
+  count-child-dirs(libs.ds) is 3
+end
+
 fun how-many(a-dir :: Dir) -> Number:
   doc: "Counts the number of files in a directory tree"
-  ...
+  a-dir.fs.length() + count-child-dirs(a-dir.ds)
 where:
-  nothing
+  how-many(TS) is 7
+  how-many(libs) is 3
+  how-many(docs) is 1
 end
 
 #==========Exercise 2==========#
-fun du-dir(a-dir :: Dir) -> Number:
-  doc: ""
-  ...
-where:
-  nothing
-end
+#fun du-dir(a-dir :: Dir) -> Number:
+#  doc: ""
+#  ...
+#where:
+#  nothing
+#end
 
 #==========Exercise 3==========#
-fun can-find(a-dir :: Dir, fname :: String) -> Boolean:
-  doc: ""
-  ...
-where:
-  nothing
-end
+#fun can-find(a-dir :: Dir, fname :: String) -> Boolean:
+#  doc: ""
+#  ...
+#where:
+#  nothing
+#end
 
 #==========Exercise 4==========#
-fun fynd(a-dir :: Dir, fname :: String) -> List<Path>:
-  doc: ""
-  ...
-where:
-  nothing
-end
+#fun fynd(a-dir :: Dir, fname :: String) -> List<Path>:
+#  doc: ""
+#  ...
+#where:
+#  nothing
+#end
