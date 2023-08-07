@@ -32,19 +32,19 @@ TS = dir('TS', [list: text, libs], [list: read2])
 
 
 #==========Exercise 1==========#
-fun count-child-dirs(dirs :: List<Dir>) -> Number:
+fun count-files-in-dirs(dirs :: List<Dir>) -> Number:
   doc: "Counts the number of files in a list of directories"
   cases (List) dirs:
     | empty => 0
-    | link(f, r) => f.fs.length() + count-child-dirs(f.ds) + count-child-dirs(r)
+    | link(f, r) => f.fs.length() + count-files-in-dirs(f.ds) + count-files-in-dirs(r)
   end
 where:
-  count-child-dirs(libs.ds) is 3
+  count-files-in-dirs(libs.ds) is 3
 end
 
 fun how-many(a-dir :: Dir) -> Number:
   doc: "Counts the number of files in a directory tree"
-  a-dir.fs.length() + count-child-dirs(a-dir.ds)
+  a-dir.fs.length() + count-files-in-dirs(a-dir.ds)
 where:
   how-many(TS) is 7
   how-many(libs) is 3
