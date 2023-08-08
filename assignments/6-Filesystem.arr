@@ -118,9 +118,34 @@ where:
 end
 
 #==========Exercise 4==========#
-#fun fynd(a-dir :: Dir, fname :: String) -> List<Path>:
-#  doc: ""
-#  ...
-#where:
-#  nothing
-#end
+fun fynd-in-child-dirs(dirs :: List<Dir>, fname :: String, current-path :: Path, acc :: List<Path>) -> List<Path>:
+  cases (List) dirs:
+    | empty => acc
+    | link(f, r) => 
+      if is-in-files(f.fs, fname, false) and is-in-child-dirs(f.ds, fname, false):
+        fynd-in-child-dirs(f.ds, fname, current-path + [list: f.name], link(current-path + [list: f.name], acc))
+      else if is-in-files(f.fs, fname, false):
+        link(current-path + [list: f.name], acc)
+      else if is-in-child-dirs(f.ds, fname, false):
+        fynd-in-child-dirs(f.ds, fname, current-path + [list: f.name], acc)
+      else:
+        fynd-in-child-dirs(r, fname, current-path, acc)
+      end      
+  end
+end
+
+fun fynd(a-dir :: Dir, fname :: String) -> List<Path>:
+  doc: "It consumes a Dir d and a file name (String) f, and produces a list of all the paths to all the files named f in d."
+  if is-in-files(a-dir.fs, fname, false) and is-in-child-dirs(a-dir.ds, fname, false):
+    fynd-in-child-dirs(a-dir.ds, fname, [list: a-dir.name], [list: [list: a-dir.name]])
+  else if is-in-files(a-dir.fs, fname, false):
+    [list: [list: a-dir.name]]
+  else if is-in-child-dirs(a-dir.ds, fname, false):
+    fynd-in-child-dirs(a-dir.ds, fname, [list: a-dir.name], empty)
+  else:
+    [list: ]
+  end
+where:
+  fynd(TS, "part3") is [list: [list: "TS", "Text"]]
+  fynd(TS, "read!") is [list: [list: "TS", "Libs", "Docs"], [list: "TS"] ]
+end
