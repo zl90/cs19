@@ -225,3 +225,15 @@ At each step, assess the following:
 #### Things I learned
 
 - This assignment further solidified my knowledge of _property based testing_. I learned to carefully consider what the _properties_ of the output data should be, rather than the _content_ of the output data. For example: the output list should contain no duplicate items, the output list should be the same length as the input list, and all the values in the output list should be in the correct range.
+- Gained more experience with using _testing oracles_.
+
+### Assignment 6: Filesystem
+
+#### Challenges faced
+
+- The final task `fynd` was pretty difficult. It required me to recurse over an n-ary tree while checking both the value in the node and whether the value existed deeper in the tree. Additionally, I had to keep track of the current path I was at in the "filesystem" and simulteneously accumulate a list of filepaths which led to a specified filename. This was a lot to keep track of, and I wasn't able to do it using the function signature given in the assignment spec, so I added a helper function which allowed me to do everything including checking the value, recursing on child nodes, keeping track of the current filepath and accumulating a list of filepaths.
+
+#### Things I learned
+
+- I learned how to traverse an n-ary tree using recursion. It was a lot easier than I expected.
+- I also gained some basic insight into how filesystems work under the hood.
