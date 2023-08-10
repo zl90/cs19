@@ -9,11 +9,25 @@ type Tree = support.Tree
 mt = support.mt
 node = support.node
 
-# You will come up with a Cursor definition, which may have more than
-# one variant, and can have whatever fields you need
+# test tree:
+#        1
+#       / \
+#      2   5
+#     / \   \
+#    4   3   6 
+#         \   \
+#         3.5  7
 
-# "dummy-cursor" doesn't mean anything, and you should replace it
-# with your own definition
+test-tree = 
+  node(1, [list:
+      node(2, [list:
+          node(4, empty),
+          node(3, [list: 
+              node(3.5, empty)])]),
+      node(5, [list:
+          node(6, [list: 
+              node(7, empty)])])])
+
 data Cursor<A>:
   | cursor(tree :: Tree<A>)
 end
