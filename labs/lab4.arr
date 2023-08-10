@@ -89,13 +89,10 @@ end
 # Answer:
 fun btree-fold<A, B>(folder :: (B, A -> B), traversal :: (BTree<A> -> List<A>), acc :: B, tree :: BTree<A>) -> B:
   doc: 'Uses `traversal` to generate a List<A> of the values in tree in the order that the should be folded, then applies the `folder` function over the generated List<A>, starting with the initial value `acc`'
-  cases (BTree) tree:
-    | mt => acc
-    | node(value, left, right) =>
-      # Finish this off tomorrow
-  end
+  lst = traversal(tree)
+  fold(folder, acc, lst)
 where:
-  btree-fold(lam(acc, item): string-to-upper(item) end, btree-in-order, empty, testTree) is [list: 'D', 'B', 'E', 'A', 'C']
+  btree-fold(lam(acc, item): acc + [list: string-to-upper(item)] end, btree-in-order, empty, testTree) is [list: 'D', 'B', 'E', 'A', 'C']
 end
 
 
