@@ -29,11 +29,47 @@ test-tree =
               node(7, empty)])])])
 
 data Cursor<A>:
-  | cursor(tree :: Tree<A>)
+  | mt-cursor
+  | cursor(tree :: Tree<A>, parent :: Cursor)
+end
+
+fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), parent :: Cursor) -> Cursor<A>:
+  cases (List) trees:
+    | empty => mt-cursor
+    | link(f, r) =>
+      cases (Tree) f:
+        | mt => mt-cursor
+        | node(value, children) =>
+          if pred(value):
+            cursor(f, parent)
+          else if children.length() > 0:
+            result = find-cursor-in-children(children, pred, cursor(f, parent))
+            if not(result == mt-cursor):
+              result
+            else:
+              find-cursor-in-children(r, pred, parent)
+            end
+          else:
+            find-cursor-in-children(r, pred, parent)
+          end
+      end
+  end
 end
 
 fun find-cursor<A>(tree :: Tree<A>, pred :: (A -> Boolean)) -> Cursor<A>:
-  dummy-cursor(tree)
+  cases (Tree) tree:
+    | mt => mt-cursor
+    | node(value, children) =>
+      if pred(value):
+        cursor(tree, mt-cursor)
+      else:
+        find-cursor-in-children(children, pred, cursor(tree, mt-cursor))
+      end
+  end
+where:
+  find-cursor(test-tree, lam(x): x == 1 end) is cursor(test-tree, mt-cursor)
+  find-cursor(test-tree,  lam(x): x == 3 end) is cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  find-cursor(test-tree,  lam(x): x == 6 end) is cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
 end
 
 fun up<A>(cur :: Cursor<A>) -> Cursor<A>:
