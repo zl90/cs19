@@ -97,7 +97,13 @@ fun down<A>(cur :: Cursor<A>, child-index :: Number ) -> Cursor<A>:
 end
 
 fun update<A>(cur :: Cursor<A>, func :: (Tree<A> -> Tree<A>)) -> Cursor<A>:
-  cur
+  doc: 'Updates an input cursor `cur` by applying the functor `func` to the tree in the input cursor'
+  cursor(func(cur.tree), cur.parent)
+where:
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  update(cursor(test-tree, mt-cursor), lam(x): mt end) is cursor(mt, mt-cursor)
+  update(cursor3, lam(x): mt end) is cursor(mt, cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  update(cursor3, lam(x): node(3,[list:node(3.5,[list:node(45, [list:])])]) end) is cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
 end
 
 fun to-tree<A>( cur :: Cursor<A> ) -> Tree<A>:
