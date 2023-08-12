@@ -30,10 +30,10 @@ test-tree =
 
 data Cursor<A>:
   | mt-cursor
-  | cursor(tree :: Tree<A>, parent :: Cursor)
+  | cursor(tree :: Tree<A>, parent :: Cursor, index :: Number)
 end
 
-fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), parent :: Cursor) -> Cursor<A>:
+fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), parent :: Cursor, index :: Number) -> Cursor<A>:
   doc: 'Finds the cursor in a list of trees where the predicate is true (depth first)'
   cases (List) trees:
     | empty => mt-cursor
@@ -42,16 +42,16 @@ fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), p
         | mt => mt-cursor
         | node(value, children) =>
           if pred(value):
-            cursor(f, parent)
+            cursor(f, parent, index)
           else if children.length() > 0:
-            result = find-cursor-in-children(children, pred, cursor(f, parent))
+            result = find-cursor-in-children(children, pred, cursor(f, parent, index), 0)
             if not(result == mt-cursor):
               result
             else:
-              find-cursor-in-children(r, pred, parent)
+              find-cursor-in-children(r, pred, parent, index + 1)
             end
           else:
-            find-cursor-in-children(r, pred, parent)
+            find-cursor-in-children(r, pred, parent, index + 1)
           end
       end
   end
@@ -63,9 +63,9 @@ fun find-cursor<A>(tree :: Tree<A>, pred :: (A -> Boolean)) -> Cursor<A>:
     | mt => mt-cursor
     | node(value, children) =>
       if pred(value):
-        cursor(tree, mt-cursor)
+        cursor(tree, mt-cursor, 0)
       else:
-        result = find-cursor-in-children(children, pred, cursor(tree, mt-cursor))
+        result = find-cursor-in-children(children, pred, cursor(tree, mt-cursor, 0), 0)
         if result == mt-cursor:
           raise("Could not find node matching predicate")
         else:
@@ -74,9 +74,9 @@ fun find-cursor<A>(tree :: Tree<A>, pred :: (A -> Boolean)) -> Cursor<A>:
       end
   end
 where:
-  find-cursor(test-tree, lam(x): x == 1 end) is cursor(test-tree, mt-cursor)
-  find-cursor(test-tree, lam(x): x == 3 end) is cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  find-cursor(test-tree, lam(x): x == 6 end) is cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  find-cursor(test-tree, lam(x): x == 1 end) is cursor(test-tree, mt-cursor, 0)
+  find-cursor(test-tree, lam(x): x == 3 end) is cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
+  find-cursor(test-tree, lam(x): x == 6 end) is cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),1),0)
   find-cursor(test-tree, lam(x): x == 88 end) raises "Could not find node matching predicate"
 end
 
@@ -88,8 +88,8 @@ fun up<A>(cur :: Cursor<A>) -> Cursor<A>:
     cur.parent
   end
 where:
-    up(mt-cursor) raises "Invalid movement"
-  up(cursor(test-tree, mt-cursor)) is mt-cursor
+  up(mt-cursor) raises "Invalid movement"
+  up(cursor(test-tree, mt-cursor, 0)) is mt-cursor
 end
 
 fun left<A>(cur :: Cursor<A>) -> Cursor<A>:
@@ -105,23 +105,23 @@ fun down<A>(cur :: Cursor<A>, child-index :: Number ) -> Cursor<A>:
   if (cur.tree.children == empty) or (cur.tree.children.get(child-index) == "too large") or (cur.tree.children.get(child-index) == "invalid argument"):
     raise("Invalid movement")
   else:
-    cursor(cur.tree.children.get(child-index), cur)
+    cursor(cur.tree.children.get(child-index), cur, child-index)
   end
   where:
-  cursor2 = cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor))
-  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor2 = cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0)
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
   down(cursor2, 1) is cursor3
-  down(cursor(node(5, empty), mt-cursor), 2) raises "Invalid movement"
+  down(cursor(node(5, empty), mt-cursor, 0), 2) raises "Invalid movement"
 end
 
 fun update<A>(cur :: Cursor<A>, func :: (Tree<A> -> Tree<A>)) -> Cursor<A>:
   doc: 'Updates an input cursor `cur` by applying the functor `func` to the tree in the input cursor'
-  cursor(func(cur.tree), cur.parent)
+  cursor(func(cur.tree), cur.parent, cur.index)
 where:
-  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  update(cursor(test-tree, mt-cursor), lam(x): mt end) is cursor(mt, mt-cursor)
-  update(cursor3, lam(x): mt end) is cursor(mt, cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  update(cursor3, lam(x): node(3,[list:node(3.5,[list:node(45, [list:])])]) end) is cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
+  update(cursor(test-tree, mt-cursor, 0), lam(x): mt end) is cursor(mt, mt-cursor, 0)
+  update(cursor3, lam(x): mt end) is cursor(mt, cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
+  update(cursor3, lam(x): node(3,[list:node(3.5,[list:node(45, [list:])])]) end) is cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
 end
 
 fun clean-mt-nodes-from-children<A>(trees :: List<Tree<A>>, acc :: List<Tree<A>>) -> List<Tree<A>>:
@@ -145,11 +145,11 @@ fun to-tree<A>( cur :: Cursor<A> ) -> Tree<A>:
     node(cur.tree.value, clean-mt-nodes-from-children(cur.tree.children, empty))
   end
 where:
-  cursor3 = cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  cursor3-mt = cursor(node(3,[list:node(3.5,[list:node(45, [list: mt])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor3 = cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
+  cursor3-mt = cursor(node(3,[list:node(3.5,[list:node(45, [list: mt])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
   to-tree(cursor3) is node(3,[list:node(3.5,[list:node(45, [list:])])])
   to-tree(cursor3-mt) is node(3,[list:node(3.5,[list:node(45, [list:])])])
-  to-tree(cursor(mt, mt-cursor)) is mt
+  to-tree(cursor(mt, mt-cursor, 0)) is mt
 
 end
 
@@ -160,10 +160,10 @@ fun get-node-val<A>(cur :: Cursor<A>) -> Option<A>:
     | otherwise: some(cur.tree.value)
   end
 where:
-  cursor6 = cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  cursor0 = cursor(mt, mt-cursor)
-  cursor1 = cursor(test-tree, mt-cursor)
+  cursor6 = cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),1),0)
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0),1)
+  cursor0 = cursor(mt, mt-cursor,0)
+  cursor1 = cursor(test-tree, mt-cursor,0)
   get-node-val(cursor6) is some(6)
   get-node-val(cursor0) is none
   get-node-val(cursor1) is some(1)
