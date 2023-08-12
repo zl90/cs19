@@ -237,3 +237,16 @@ At each step, assess the following:
 
 - I learned how to traverse an n-ary tree using recursion. It was a lot easier than I expected.
 - I also gained some basic insight into how filesystems work under the hood.
+
+### Assignment 7: Updater
+
+This assignment teaches you how to make *atomic* updates to a tree with *arbitrary degree* (that is, each node in the tree can have any number of children). Atomic updates are selective updates made to a specific node/subtree, without having to replace the entire tree. This is done by creating a datatype that can act as a cursor, or pointer, to a specific subtree. This means we can update a tree in constant time, given a cursor. I had a tonne of fun with this assignment.
+
+#### Challenges faced
+
+- The biggest challenge of this assignment was (once again) choosing the correct properties to use in the main data type: the Cursor. I got all the way to the last few tasks before realising I needed an extra property in the Cursor to hold its sibling index. Without this property my functions would work in linear time, but that wasn't good enough to satisfy the assignment requirements, so I had to refactor the entire program (including the tests) to work with the new property.
+
+### Things I learned
+
+- How to think about trees: in terms of cursors.
+- How to update a subtree within a tree in constant time.
