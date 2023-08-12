@@ -81,7 +81,15 @@ where:
 end
 
 fun up<A>(cur :: Cursor<A>) -> Cursor<A>:
-  cur
+  doc: 'Returns the parent of the input cursor'
+  if cur == mt-cursor:
+    raise("Invalid movement")
+  else:
+    cur.parent
+  end
+where:
+    up(mt-cursor) raises "Invalid movement"
+  up(cursor(test-tree, mt-cursor)) is mt-cursor
 end
 
 fun left<A>(cur :: Cursor<A>) -> Cursor<A>:
@@ -93,7 +101,17 @@ fun right<A>(cur :: Cursor<A>) -> Cursor<A>:
 end
 
 fun down<A>(cur :: Cursor<A>, child-index :: Number ) -> Cursor<A>:
-  cur
+  doc: 'Returns the child of the input cursor at the specified index'
+  if (cur.tree.children == empty) or (cur.tree.children.get(child-index) == "too large") or (cur.tree.children.get(child-index) == "invalid argument"):
+    raise("Invalid movement")
+  else:
+    cursor(cur.tree.children.get(child-index), cur)
+  end
+  where:
+  cursor2 = cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor))
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  down(cursor2, 1) is cursor3
+  down(cursor(node(5, empty), mt-cursor), 2) raises "Invalid movement"
 end
 
 fun update<A>(cur :: Cursor<A>, func :: (Tree<A> -> Tree<A>)) -> Cursor<A>:
