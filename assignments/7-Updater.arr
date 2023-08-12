@@ -106,8 +106,33 @@ where:
   update(cursor3, lam(x): node(3,[list:node(3.5,[list:node(45, [list:])])]) end) is cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
 end
 
+fun clean-mt-nodes-from-children<A>(trees :: List<Tree<A>>, acc :: List<Tree<A>>) -> List<Tree<A>>:
+  doc: 'Prunes all `mt` nodes from a list of trees'
+  cases (List) trees:
+    | empty => acc
+    | link(f, r) =>
+      cases (Tree) f:
+        | mt => clean-mt-nodes-from-children(r, acc)
+        | node(value, children) =>
+            clean-mt-nodes-from-children(r, acc + [list: node(value, clean-mt-nodes-from-children(children, empty))])
+      end
+  end
+end
+
 fun to-tree<A>( cur :: Cursor<A> ) -> Tree<A>:
-  cur.tree
+  doc: 'Converts a cursor to a tree'
+  if cur.tree == mt:
+    mt
+  else:
+    node(cur.tree.value, clean-mt-nodes-from-children(cur.tree.children, empty))
+  end
+where:
+  cursor3 = cursor(node(3,[list:node(3.5,[list:node(45, [list:])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor3-mt = cursor(node(3,[list:node(3.5,[list:node(45, [list: mt])])]), cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  to-tree(cursor3) is node(3,[list:node(3.5,[list:node(45, [list:])])])
+  to-tree(cursor3-mt) is node(3,[list:node(3.5,[list:node(45, [list:])])])
+  to-tree(cursor(mt, mt-cursor)) is mt
+
 end
 
 fun get-node-val<A>(cur :: Cursor<A>) -> Option<A>: 
