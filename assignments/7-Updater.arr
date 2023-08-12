@@ -34,6 +34,7 @@ data Cursor<A>:
 end
 
 fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), parent :: Cursor) -> Cursor<A>:
+  doc: 'Finds the cursor in a list of trees where the predicate is true (depth first)'
   cases (List) trees:
     | empty => mt-cursor
     | link(f, r) =>
@@ -57,6 +58,7 @@ fun find-cursor-in-children<A>(trees :: List<Tree<A>>, pred :: (A -> Boolean), p
 end
 
 fun find-cursor<A>(tree :: Tree<A>, pred :: (A -> Boolean)) -> Cursor<A>:
+  doc: 'Finds the cursor in the tree where the predicate is true (depth first)'
   cases (Tree) tree:
     | mt => mt-cursor
     | node(value, children) =>
@@ -103,5 +105,18 @@ fun to-tree<A>( cur :: Cursor<A> ) -> Tree<A>:
 end
 
 fun get-node-val<A>(cur :: Cursor<A>) -> Option<A>: 
-  none
+  doc: 'Extracts the tree at the cursor'
+  ask:
+    | cur.tree == mt then: none
+    | otherwise: some(cur.tree)
+  end
+where:
+  cursor6 = cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  cursor0 = cursor(mt, mt-cursor)
+  cursor1 = cursor(test-tree, mt-cursor)
+  get-node-val(cursor6) is some(node(6,[list:node(7,[list:])]))
+  get-node-val(cursor0) is none
+  get-node-val(cursor1) is some(test-tree)
+  get-node-val(cursor3) is some(node(3,[list:node(3.5,[list:])]))
 end
