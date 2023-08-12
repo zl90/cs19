@@ -93,11 +93,49 @@ where:
 end
 
 fun left<A>(cur :: Cursor<A>) -> Cursor<A>:
-  cur
+  doc: 'Returns the cursor to the left of the input cursor `cur`'
+  parent = cur.parent
+  if parent == mt-cursor:
+    raise("Invalid movement")
+  else:
+    siblings = parent.tree.children
+    index = cur.index
+    if (siblings == mt-cursor) or (index == 0) or (siblings.length() <= 1):
+      raise("Invalid movement")
+    else:
+      cursor(siblings.get(index - 1), parent, index - 1)
+    end
+  end
+where:
+  cursor5 = cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),1)
+  cursor2 = cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0)
+    cursor0 = cursor(mt, mt-cursor,0)
+  left(cursor5) is cursor2
+  left(cursor2) raises "Invalid movement"
+  left(cursor0) raises "Invalid movement"
 end
 
 fun right<A>(cur :: Cursor<A>) -> Cursor<A>:
-  cur
+  doc: 'Returns the cursor to the right of the input cursor `cur`'
+   parent = cur.parent
+  if parent == mt-cursor:
+    raise("Invalid movement")
+  else:
+    siblings = parent.tree.children
+    index = cur.index
+    if (siblings == mt-cursor) or ((index + 1) >= siblings.length()) or (siblings.length() <= 1):
+      raise("Invalid movement")
+    else:
+      cursor(siblings.get(index + 1), parent, index + 1)
+    end
+  end
+where:
+    cursor5 = cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),1)
+  cursor2 = cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor,0),0)
+    cursor0 = cursor(mt, mt-cursor,0)
+  right(cursor2) is cursor5
+  right(cursor5) raises "Invalid movement"
+  right(cursor0) raises "Invalid movement"
 end
 
 fun down<A>(cur :: Cursor<A>, child-index :: Number ) -> Cursor<A>:
