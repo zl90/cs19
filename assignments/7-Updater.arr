@@ -63,13 +63,19 @@ fun find-cursor<A>(tree :: Tree<A>, pred :: (A -> Boolean)) -> Cursor<A>:
       if pred(value):
         cursor(tree, mt-cursor)
       else:
-        find-cursor-in-children(children, pred, cursor(tree, mt-cursor))
+        result = find-cursor-in-children(children, pred, cursor(tree, mt-cursor))
+        if result == mt-cursor:
+          raise("Could not find node matching predicate")
+        else:
+          result
+        end
       end
   end
 where:
   find-cursor(test-tree, lam(x): x == 1 end) is cursor(test-tree, mt-cursor)
-  find-cursor(test-tree,  lam(x): x == 3 end) is cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
-  find-cursor(test-tree,  lam(x): x == 6 end) is cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  find-cursor(test-tree, lam(x): x == 3 end) is cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  find-cursor(test-tree, lam(x): x == 6 end) is cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
+  find-cursor(test-tree, lam(x): x == 88 end) raises "Could not find node matching predicate"
 end
 
 fun up<A>(cur :: Cursor<A>) -> Cursor<A>:
