@@ -111,18 +111,18 @@ fun to-tree<A>( cur :: Cursor<A> ) -> Tree<A>:
 end
 
 fun get-node-val<A>(cur :: Cursor<A>) -> Option<A>: 
-  doc: 'Extracts the tree at the cursor'
+  doc: 'Extracts the value of the node at the cursor'
   ask:
     | cur.tree == mt then: none
-    | otherwise: some(cur.tree)
+    | otherwise: some(cur.tree.value)
   end
 where:
   cursor6 = cursor(node(6,[list:node(7,[list:])]),cursor(node(5,[list:node(6,[list:node(7,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
   cursor3 = cursor(node(3,[list:node(3.5,[list:])]),cursor(node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),cursor(node(1,[list:node(2,[list:node(4,[list:]),node(3,[list:node(3.5,[list:])])]),node(5,[list:node(6,[list:node(7,[list:])])])]),mt-cursor)))
   cursor0 = cursor(mt, mt-cursor)
   cursor1 = cursor(test-tree, mt-cursor)
-  get-node-val(cursor6) is some(node(6,[list:node(7,[list:])]))
+  get-node-val(cursor6) is some(6)
   get-node-val(cursor0) is none
-  get-node-val(cursor1) is some(test-tree)
-  get-node-val(cursor3) is some(node(3,[list:node(3.5,[list:])]))
+  get-node-val(cursor1) is some(1)
+  get-node-val(cursor3) is some(3)
 end
