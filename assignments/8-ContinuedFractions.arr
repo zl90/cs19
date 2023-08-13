@@ -34,9 +34,20 @@ where:
   take(nats, 5) is [list: 0, 1, 2, 3, 4]
 end
 
+fun repeating-stream-builder<A>(lst :: List<A>, s :: Stream<A>) -> Stream<A>:
+  cases (List) lst:
+    | empty => lz-link(s.first, {(): s.rest()})
+    | link(f, r) =>
+      lz-link(f, {(): repeating-stream-builder(r, s)})
+  end
+end
+
 fun repeating-stream(numbers :: List<Number>) -> Stream<Number>:
-  doc: ""
-  ...
+  doc: "Given a list, produces a stream that repeats the list over and over"
+  rec result = lz-link(numbers.first, {(): repeating-stream-builder(numbers.rest, result)})
+  result
+where:
+  take(repeating-stream([list: 1, 2, 3]), 8) is [list: 1, 2, 3, 1, 2, 3, 1, 2]
 end
 
 fun threshold(approximations :: Stream<Number>, thresh :: Number)-> Number:
