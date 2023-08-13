@@ -16,8 +16,22 @@ lz-link = support.lz-link
 # cf-phi :: Stream<Number> = 
 # cf-e :: Stream<Number> = 
 
+fun nats-from(n :: Number) -> Stream<Number>:
+  lz-link(n, {(): nats-from(n + 1)})
+end
+
 fun take<A>(s :: Stream<A>, n :: Number) -> List<A>:
-  ...
+  doc: "Takes the first n elements of a stream and returns them as a list"
+  if n == 0:
+    empty
+  else:
+    link(s.first, take(s.rest(), n - 1))
+  end
+where:
+  rec ones = lz-link(1, {(): ones})
+  nats = nats-from(0)
+  take(ones, 5) is [list: 1, 1, 1, 1, 1]
+  take(nats, 5) is [list: 0, 1, 2, 3, 4]
 end
 
 fun repeating-stream(numbers :: List<Number>) -> Stream<Number>:
