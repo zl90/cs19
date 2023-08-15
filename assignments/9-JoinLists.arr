@@ -68,8 +68,30 @@ end
 
 fun j-nth<A>(jl :: JoinList<A>%(is-non-empty-jl),
     n :: Number) -> A:
-  doc:""
-  ...
+  doc:"Returns the nth element (using a 0-based index) of a list containing at least n+1 elements"
+  
+  ## need to draw this one 
+  cases (JoinList) jl:
+    | one(e) => 
+      if n == 0: 
+        e
+      else:
+        raise("too large")
+      end
+    | join-list(l1, l2, _) =>
+      if n == 0:
+        j-first(l1)
+      else if n == 1:
+        j-first(l2)
+      else:
+        j-nth(l1, n - 1)
+      end
+  end
+where:
+  j-nth(test-jl, 0) is 1
+  j-nth(test-jl, 5) is 6
+  j-nth(test-jl, 6) raises "too large"
+  j-nth(one(5), 0) is 5
 end
 
 
