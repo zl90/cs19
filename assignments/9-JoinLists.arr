@@ -52,8 +52,17 @@ end
   
   
 fun j-length<A>(jl :: JoinList<A>) -> Number:
-  doc:""
-  ...
+  doc:"Returns the length of the input JoinList"
+  cases (JoinList) jl:
+    | empty-join-list => 0
+    | one(e) => 1
+    | join-list(l1, l2, _) =>
+      j-length(l1) + j-length(l2)
+  end
+where:
+  j-length(test-jl) is 6
+  j-length(one(4)) is 1
+  j-length(empty-join-list) is 0
 end
 
 
