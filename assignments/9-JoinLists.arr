@@ -117,8 +117,17 @@ end
 
 
 fun j-map<A,B>(map-fun :: (A -> B), jl :: JoinList<A>) -> JoinList<B>:
-  doc:""
-  empty-join-list
+  doc:"Maps over the joinlist, returning a new joinlist with each element having the `map-fun` function applied to it"
+  cases (JoinList) jl:
+    | empty-join-list => empty-join-list
+    | one(e) => one(map-fun(e))
+    | join-list(_,_,_) => 
+      split(jl, lam(l1, l2): 
+          j-map(map-fun, l1).join(j-map(map-fun, l2))
+        end)
+  end
+where:
+  join-list-to-list(j-map(lam(x): x + 1 end, test-jl)) is [list: 2, 3, 4, 5, 6, 7]
 end
 
 
