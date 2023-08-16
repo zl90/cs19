@@ -132,8 +132,21 @@ end
 
 
 fun j-filter<A>(filter-fun :: (A -> Boolean), jl :: JoinList<A>) -> JoinList<A>:
-  doc:""
-  empty-join-list
+  doc:"Filters out elements in the joinlist that do not satisfy the predicate function `filter-fun`"
+  cases (JoinList) jl:
+    | empty-join-list => empty-join-list
+    | one(e) => if filter-fun(e):
+        one(e)
+      else:
+        empty-join-list
+      end
+    | join-list(_,_,_) =>
+      split(jl, lam(l1, l2):
+          j-filter(filter-fun, l1).join(j-filter(filter-fun, l2))
+        end)
+  end
+where:
+  join-list-to-list(j-filter(lam(x): x == 2 end, test-jl)) is [list: 2]
 end
 
 
