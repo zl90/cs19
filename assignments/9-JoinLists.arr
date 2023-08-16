@@ -69,9 +69,7 @@ end
 fun j-nth<A>(jl :: JoinList<A>%(is-non-empty-jl),
     n :: Number) -> A:
   doc:"Returns the nth element (using a 0-based index) of a list containing at least n+1 elements"
-  
-  ## need to draw this one 
-  cases (JoinList) jl:
+    cases (JoinList) jl:
     | one(e) => 
       if n == 0: 
         e
@@ -79,8 +77,14 @@ fun j-nth<A>(jl :: JoinList<A>%(is-non-empty-jl),
         raise("too large")
       end
     | join-list(_, _, _) =>
-      split(jl, lam(x, y):  end)
-      
+      split(jl, lam(j1, j2): 
+          j1-length = j-length(j1)
+          if j1-length <= n:
+            j-nth(j2, n - j1-length)
+          else:
+            j-nth(j1, n)
+          end
+        end)
   end
 where:
   j-nth(test-jl, 0) is 1
@@ -92,8 +96,23 @@ end
 
 fun j-max<A>(jl :: JoinList<A>%(is-non-empty-jl), 
     cmp :: (A, A -> Boolean)) -> A:
-  doc:""
-  ...
+  doc:"Returns the largest element in the JoinList according to the comparison function `cmp`"
+  cases (JoinList) jl:
+    | one(e) => e
+    | join-list(_,_,_) => 
+      split(jl, lam(l1, l2): 
+          max-l1 = j-max(l1, cmp)
+          max-l2 = j-max(l2, cmp)
+          if cmp(max-l1, max-l2):
+            max-l2
+          else:
+            max-l1
+          end
+        end)
+  end
+where:
+  j-max(test-jl, lam(a,b): a < b end) is 6
+  j-max(one(7), lam(a,b): a < b end) is 7
 end
 
 
