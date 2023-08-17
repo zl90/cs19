@@ -29,7 +29,7 @@ fun j-first<A>(jl :: JoinList<A>%(is-non-empty-jl)) -> A:
   cases (JoinList) jl:
     | one(e) => e
     | join-list(_, _, _) =>
-      j-first(split(jl, lam(x, _): x end))
+      split(jl, lam(x, _): j-first(x) end)
   end
 where:
   j-first(test-jl) is 1
@@ -152,8 +152,16 @@ end
 
 fun j-reduce<A>(reduce-func :: (A, A -> A), 
     jl :: JoinList<A>%(is-non-empty-jl)) -> A:
-  doc:""
-  ...
+  doc:"Distributes an operator (`reduce-func`) across a non-empty list."
+  cases (JoinList) jl:
+    | one(e) => e
+    | join-list(_,_,_) =>
+      split(jl, lam(l1, l2): 
+          reduce-func(j-reduce(reduce-func, l1), j-reduce(reduce-func, l2))
+        end)
+  end
+where:
+  j-reduce(lam(x,y): x - y end, list-to-join-list([list: 1, 2, 3])) is (1 - 2 - 3)
 end
 
 
