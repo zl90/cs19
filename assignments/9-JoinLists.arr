@@ -23,6 +23,7 @@ is-non-empty-jl = J.is-non-empty-jl
 ##Implementation
 
 test-jl = join-list(join-list(join-list(one(1), one(2), 2), one(3), 3), join-list(join-list(one(4), one(5), 2), one(6), 3), 6)
+test-jl-unsorted = join-list(join-list(join-list(one(6), one(5), 2), one(4), 3), join-list(join-list(one(3), one(2), 2), one(1), 3), 6)
 
 fun j-first<A>(jl :: JoinList<A>%(is-non-empty-jl)) -> A:
   doc:"Returns the first element of a JoinList"
@@ -164,8 +165,36 @@ where:
   j-reduce(lam(x,y): x - y end, list-to-join-list([list: 1, 2, 3])) is (1 - 2 - 3)
 end
 
+fun j-sort-combine<A>(cmp-fun :: (A, A -> Boolean), x :: JoinList<A>, y :: JoinList<A>) -> JoinList<A>:
+  doc: "Combines two sorted lists according to a comparison function"
+  cases (JoinList) x:
+    | empty-join-list => y
+    | else =>
+      cases (JoinList) y:
+        | empty-join-list => x
+        | else =>
+          x-first = j-first(x)
+          y-first = j-first(y)
+          if cmp-fun(x-first, y-first):
+            one(x-first).join(j-sort-combine(cmp-fun, j-rest(x), y))
+          else:
+            one(y-first).join(j-sort-combine(cmp-fun, x, j-rest(y)))
+          end
+      end
+  end
+end
+
 
 fun j-sort<A>(cmp-fun :: (A, A -> Boolean), jl :: JoinList<A>) -> JoinList<A>:
-  doc:""
-  empty-join-list
+  doc:"Sorts a joinlist"
+  cases (JoinList) jl:
+    | empty-join-list => empty-join-list
+    | one(e) => one(e)
+    | join-list(_,_,_) =>
+      split(jl, lam(l1, l2):
+          j-sort-combine(cmp-fun, j-sort(cmp-fun, l1), j-sort(cmp-fun, l2))
+        end)
+  end
+where:
+      join-list-to-list(j-sort(lam(a,b): a < b end, test-jl-unsorted)) is [list: 1, 2, 3, 4, 5, 6]
 end
