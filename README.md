@@ -256,3 +256,9 @@ This assignment teaches you how to make *atomic* updates to a tree with *arbitra
 #### Challenges faced
 
 - The final task `j-sort` was extremely difficult. It required us to sort a tree-like data structure which was designed to simulate a distributed data set. I had to seek help to finish this task, unfortunately. It required Pyret syntax knowledge that I simply didn't have (using `else` in a `cases` statement). Also, it required two steps: firstly to sort the split data sets, and then to combine the sorted sets in order. I wasn't able to figure this out by myself. I will be coming back to this assignment to have another attempt at it later because I really want to solidify this knowledge. I'm down, but not out!
+- 
+### List of assignments I will be re-doing
+
+- Assignment 2: Nile. I struggled alot with this assignment due to my lack of Pyret knowledge and my inexperience with using recursion. Now that I have more experience I'll be having another attempt.
+- Assignment 8: Continued Fractions. This assignment was really difficult for me as I don't have a mathematical background. I'm definitely going to attack it again after I complete the rest of the course.
+- Assignment 10: MapReduce. I wasn't able to complete the final tasks due to the way I wrote my `shuffle-helper` function. I couldn't see a way to make this generic for every possible reducer input. But I know I can figure it out, I'll be trying again later.
