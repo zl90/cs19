@@ -95,42 +95,4 @@ where:
   map-reduce(test-input, wc-map, wc-reduce) is [list: tv('this', 2), tv('is', 2), tv('a', 1), tv('sentence', 1), tv('foo', 1), tv('bar', 1)]
 end
 
-### B. Your anagram implementation  
-  
-fun anagram-map(input :: Tv-pair<String, String>) 
-  -> List<Tv-pair<String, String>>:
-  doc:""
-  empty
-where:
-  empty is empty
-end
-
-fun anagram-reduce(input :: Tv-pair<String, List<String>>) 
-  -> Tv-pair<String, List<String>>:
-  doc:""
-  empty
-where:
-  empty is empty
-end
-
-
-## C. Your Nile implementation
-
-fun recommend(title :: String, 
-  book-records :: List<Tv-pair<String, String>>)
-  -> Tv-pair<Number, List<String>>:
-  doc:""
-  empty
-where:
-  empty is empty
-end
-
-fun popular-pairs(book-records :: List<Tv-pair<String, String>>) 
-  -> Tv-pair<Number, List<String>>:
-  doc:""
-  empty
-where:
-  empty is empty
-end
-
 
