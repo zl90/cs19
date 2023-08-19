@@ -28,13 +28,37 @@ where:
   mapper-helper([list: tv('test', 'this is a sentence'), tv('test2', 'this is foo bar')], wc-map) is [list: tv('this', 1), tv('is', 1), tv('a', 1), tv('sentence', 1), tv('this', 1), tv('is', 1), tv('foo', 1), tv('bar', 1)]
 end
 
+fun get-index(lst :: List<Tv-pair>, elt :: Tv-pair, n :: Number) -> Number:
+  cases (List) lst:
+    | empty => raise('Element does not exist in the list')
+    | link(f, r) =>
+      if f.tag == elt.tag:
+        n
+      else:
+        get-index(r, elt, n + 1)
+      end
+  end
+end
+
+fun tv-contains(lst :: List<Tv-pair>, elt :: Tv-pair) -> Boolean:
+  cases (List) lst:
+    | empty => false
+    | link(f, r) =>
+      if f.tag == elt.tag:
+        true
+      else:
+        tv-contains(r, elt)
+      end
+  end
+end
+
 fun shuffle-helper<M,N>(input :: List<Tv-pair<M,N>>, acc :: List<Tv-pair<M,List<N>>>) -> List<Tv-pair<M,List<N>>>:
   cases (List) input:
     | empty => acc
     | link(f, r) =>
-      if acc.member(f):
-        #figure out how to add to an existing element
-        shuffle-helper(r, acc + [list: f])
+      if tv-contains(acc, f):
+        index = get-index(acc, f, 0)
+        shuffle-helper(r, acc.set(index, tv(f.tag, acc.get(index).value + [list: f.value])))
       else:
         shuffle-helper(r, acc + [list: tv(f.tag, [list: f.value])])
       end
