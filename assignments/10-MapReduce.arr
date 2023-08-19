@@ -53,6 +53,7 @@ fun tv-contains(lst :: List<Tv-pair>, elt :: Tv-pair) -> Boolean:
 end
 
 fun shuffle-helper<M,N>(input :: List<Tv-pair<M,N>>, acc :: List<Tv-pair<M,List<N>>>) -> List<Tv-pair<M,List<N>>>:
+  doc: "Takes a list of mapper outputs and converts it into a list of reducer inputs"
   cases (List) input:
     | empty => acc
     | link(f, r) =>
@@ -68,13 +69,30 @@ where:
   shuffle-helper(test-input, empty) is [list: tv('this', [list: 1,1]), tv('is', [list: 1,1]), tv('a', [list: 1]), tv('sentence', [list: 1]), tv('foo', [list: 1]), tv('bar', [list: 1])]
 end
 
+fun reduce-helper<M,N,O>(input :: List<Tv-pair<M,List<N>>>, reducer :: (Tv-pair<M,List<N>> -> Tv-pair<M,O>)) -> List<Tv-pair<M,O>>:
+  doc: "Applies a reducer function to a list of tag-value pairs"
+  cases (List) input:
+    | empty => empty
+    | link(f, r) =>
+      link(reducer(f), reduce-helper(r, reducer))
+  end
+where:
+  test-input = [list: tv('this', [list: 1,1]), tv('is', [list: 1,1]), tv('a', [list: 1]), tv('sentence', [list: 1]), tv('foo', [list: 1]), tv('bar', [list: 1])]
+  reduce-helper(test-input, wc-reduce) is [list: tv('this', 2), tv('is', 2), tv('a', 1), tv('sentence', 1), tv('foo', 1), tv('bar', 1)]
+end
+
 fun map-reduce<A,B,M,N,O>(input :: List<Tv-pair<A,B>>,
     mapper :: (Tv-pair<A,B> -> List<Tv-pair<M,N>>),
     reducer :: (Tv-pair<M,List<N>> -> Tv-pair<M,O>)) -> List<Tv-pair<M,O>>:
-  doc:""
-  empty
+  doc:"A simplified, recursive simulation of Google's MapReduce framework"
+  mapped-output = mapper-helper(input, mapper)
+  shuffled-output = shuffle-helper(mapped-output, empty)
+  reduced-output = reduce-helper(shuffled-output, reducer)
+  
+  reduced-output
 where:
-  empty is empty
+  test-input = [list: tv('test', 'this is a sentence'), tv('test2', 'this is foo bar')]
+  map-reduce(test-input, wc-map, wc-reduce) is [list: tv('this', 2), tv('is', 2), tv('a', 1), tv('sentence', 1), tv('foo', 1), tv('bar', 1)]
 end
 
 ### B. Your anagram implementation  
