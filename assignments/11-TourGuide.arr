@@ -166,10 +166,12 @@ fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name
   # ##############################################################################
 
   # Place all the neighbors into the priority queue
+  # @TODO: need to update this function to not enqueue neighbors if they already have entries in paths or weights
   updated-queue = enqueue-neighbors(start, graph, neighbors, queue, current-weight)
   
   # Handle the minimum item from the priority queue:
   min-item = get-min(updated-queue)
+  # @TODO: Think about this step: what happens if we already have the minimum item stored in paths and weights? We need to skip it and get the next min item.
   #   1. Add minimum item to paths
   previous-path = cases (Option) paths.get(min-item.place1.name):
     | some(a) => a
@@ -184,6 +186,9 @@ fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name
   spy: updated-paths end
   
   spy: updated-queue2 end
+  
+  # @TODO: Process the next node. Need to recur here.
+  # @TODO: May need to consider whether we've already processed the node or not?
     
   empty-set
 end
