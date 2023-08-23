@@ -31,7 +31,7 @@ r5 = place("5", point(3, 0), [set: "4", "1"])
 g1 = to-graph([set: r1, r2, r3, r4, r5])
 
 data Edge:
-  | edge(place1 :: Place, place2 :: Place, distance :: Number)
+  | edge(place1 :: Place, place2 :: Place, weight :: Number)
 end
 
 data Heap:
@@ -45,7 +45,7 @@ fun insert(el :: Edge, h :: Heap) -> Heap:
   cases (Heap) h:
     | mt => node(el, mt, mt)
     | node(v,l,r) =>
-      if el.distance > v.distance:
+      if el.weight > v.weight:
         node(v, insert(el, r), l)
       else:
         node(el, insert(v, r), l)
@@ -111,20 +111,20 @@ fun reorder(h :: Heap) -> Heap:
         | node(lval, llh, lrh) =>
           cases(Heap) rh:
             | mt =>
-              if val.distance < lval.distance:
+              if val.weight < lval.weight:
                 node(val, node(lval, mt, mt), mt)
               else:
                 node(lval, node(val, mt, mt), mt)
               end
             | node(rval, rlh, rrh) =>
-              if lval.distance <= rval.distance:
-                if val.distance <= lval.distance:
+              if lval.weight <= rval.weight:
+                if val.weight <= lval.weight:
                   h
                 else:
                   node(lval, reorder(node(val, llh, lrh)), rh)
                 end
               else:
-                if val.distance <= rval.distance:
+                if val.weight <= rval.weight:
                   h
                 else:
                   node(rval, lh, reorder(node(val, rlh, rrh)))
@@ -154,18 +154,37 @@ end
 fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name>>, weights :: StringDict<Number>, queue :: Heap) -> Set<Path>:
   doc: "Performs the main algorithm loop as described in this video: https://youtu.be/CerlT7tTZfY"
   current-node = graph.get(start)
-  neighbors = current-node.neighbors
-  
-  # Keeps track of current cumulative weight from the starting point:
   current-weight = cases(Option) weights.get(start):
     | some(a) => a
     | none => 0
   end
+  neighbors = current-node.neighbors
   
-  # place all the neighbors into the queue
+  # ##############################################################################
+  # @TODO: If there are no neighbors we need to handle the next item in the queue:
+  # Will need to test this, but I think it should just work as I have it now.
+  # ##############################################################################
+
+  # Place all the neighbors into the priority queue
   updated-queue = enqueue-neighbors(start, graph, neighbors, queue, current-weight)
   
-  spy: updated-queue end
+  # Handle the minimum item from the priority queue:
+  min-item = get-min(updated-queue)
+  #   1. add new entry to paths
+  previous-path = cases (Option) paths.get(min-item.place1.name):
+    | some(a) => a
+    | none => empty
+  end
+  updated-paths = paths.set(min-item.place2.name, [list: min-item.place2.name] + previous-path)
+  #   2. add new entry to weights
+  updated-weights = weights.set(min-item.place2.name, min-item.weight)
+  #   3. pop the minimum item from the queue
+  updated-queue2 = remove-min(updated-queue)
+  
+  spy: updated-paths end
+  
+  spy: updated-queue2 end
+    
   empty-set
 end
 
@@ -173,7 +192,7 @@ fun dijkstra(start :: Name, graph :: Graph) -> Set<Path>:
   nodes = graph.names()
   queue = mt
   if nodes.member(start):
-    dijkstra-helper(start, graph, [string-dict: ], [string-dict: ], queue)
+    dijkstra-helper(start, graph, [string-dict: start, [list: start] ], [string-dict: start, 0 ], queue)
   else:
     empty-set
   end
