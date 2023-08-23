@@ -13,29 +13,22 @@ include shared-gdrive(
 
 ## DO NOT EDIT ABOVE THIS LINE
 
-## Data:
+include string-dict
 
-# data Path:
-#   | List<Name>
-# end
+# testing graphs
 
-# data Graph:
-#   | some form of list of Places
-# end
+q1 = place("1", point(0,0), [set: "2", "3"])
+q2 = place("2", point(1,0), [set: "1", "3", "4"])
+q3 = place("3", point(0,1), [set: "1", "2", "4"])
+q4 = place("4", point(2,0), [set: "2", "3"])
+g = to-graph([set: q1, q2, q3, q4])
 
-# data Point:
-#   | point(x :: Number, y :: Number)
-# end
-
-# data Place:
-#   | place(
-#       name :: Name,
-#       position :: Point,
-#       neighbors :: Set<Name>)
-# end
-#
-# NOTE: Place includes the `.distance()` method, which calculates the manhattan distance between two
-# places or two points
+r1 = place("1", point(0,0), [set: "2", "3", "5"])
+r2 = place("2", point(1,1), [set: "1", "3", "4"])
+r3 = place("3", point(1, -1), [set: "1", "2", "4"])
+r4 = place("4", point(2, 0), [set: "2", "3", "5"])
+r5 = place("5", point(3, 0), [set: "4", "1"])
+g1 = to-graph([set: r1, r2, r3, r4, r5])
 
 data Edge:
   | edge(place1 :: Place, place2 :: Place, distance :: Number)
@@ -142,8 +135,48 @@ fun reorder(h :: Heap) -> Heap:
   end
 end
 
-fun dijkstra(start :: Name, graph :: Graph) -> Set<Path>:
+# dijkstra output should look like:
+# [set: [list: 'a', 'b'], [list: 'a', 'b', 'g']]     // Include the starting node
+ 
+fun enqueue-neighbors(start:: Name, graph :: Graph, neighbors :: Set<Name>, acc :: Heap, current-weight :: Number) -> Heap:
+  doc: 'Places all the neighbors into a priority queue'
+  lst = neighbors.to-list()
+  cases (List) lst:
+    | empty => acc
+    | link(f,r) =>
+      f-node = graph.get(f)
+      start-node = graph.get(start)
+      new-edge = edge(start-node, f-node, start-node.distance(f-node) + current-weight)
+      enqueue-neighbors(start, graph, list-to-set(r), insert(new-edge, acc), current-weight)
+  end
+end
+
+fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name>>, weights :: StringDict<Number>, queue :: Heap) -> Set<Path>:
+  doc: "Performs the main algorithm loop as described in this video: https://youtu.be/CerlT7tTZfY"
+  current-node = graph.get(start)
+  neighbors = current-node.neighbors
+  
+  # Keeps track of current cumulative weight from the starting point:
+  current-weight = cases(Option) weights.get(start):
+    | some(a) => a
+    | none => 0
+  end
+  
+  # place all the neighbors into the queue
+  updated-queue = enqueue-neighbors(start, graph, neighbors, queue, current-weight)
+  
+  spy: updated-queue end
   empty-set
+end
+
+fun dijkstra(start :: Name, graph :: Graph) -> Set<Path>:
+  nodes = graph.names()
+  queue = mt
+  if nodes.member(start):
+    dijkstra-helper(start, graph, [string-dict: ], [string-dict: ], queue)
+  else:
+    empty-set
+  end
 end
 
 fun campus-tour(
@@ -156,4 +189,7 @@ end
 
 check:
   dijkstra("asdfasdf", brown-university-landmarks) is empty-set
+  dijkstra("X-Waterman-Thayer", brown-university-landmarks) is [set: [list: 'X-Waterman-Thayer']]
+  dijkstra("asdfasdf", g) is empty-set
+  dijkstra("1", g) is [set: [list: "1"], [list: "3", "1"], [list: "2", "1"], [list: "4", "2", "1"]]
 end
