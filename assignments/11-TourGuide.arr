@@ -170,15 +170,15 @@ fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name
   
   # Handle the minimum item from the priority queue:
   min-item = get-min(updated-queue)
-  #   1. add new entry to paths
+  #   1. Add minimum item to paths
   previous-path = cases (Option) paths.get(min-item.place1.name):
     | some(a) => a
     | none => empty
   end
   updated-paths = paths.set(min-item.place2.name, [list: min-item.place2.name] + previous-path)
-  #   2. add new entry to weights
+  #   2. Add minimum item to weights
   updated-weights = weights.set(min-item.place2.name, min-item.weight)
-  #   3. pop the minimum item from the queue
+  #   3. Pop the minimum item from the queue
   updated-queue2 = remove-min(updated-queue)
   
   spy: updated-paths end
