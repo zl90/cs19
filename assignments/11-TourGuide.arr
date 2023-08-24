@@ -134,20 +134,21 @@ fun reorder(h :: Heap) -> Heap:
       end
   end
 end
-
-# dijkstra output should look like:
-# [set: [list: 'a', 'b'], [list: 'a', 'b', 'g']]     // Include the starting node
  
-fun enqueue-neighbors(start:: Name, graph :: Graph, neighbors :: Set<Name>, acc :: Heap, current-weight :: Number) -> Heap:
+fun enqueue-neighbors(start:: Name, graph :: Graph, neighbors :: Set<Name>, acc :: Heap, current-weight :: Number, existing-paths :: StringDict<List<Name>>) -> Heap:
   doc: 'Places all the neighbors into a priority queue'
   lst = neighbors.to-list()
   cases (List) lst:
     | empty => acc
     | link(f,r) =>
-      f-node = graph.get(f)
-      start-node = graph.get(start)
-      new-edge = edge(start-node, f-node, start-node.distance(f-node) + current-weight)
-      enqueue-neighbors(start, graph, list-to-set(r), insert(new-edge, acc), current-weight)
+      if existing-paths.has-key(f):
+        enqueue-neighbors(start, graph, list-to-set(r), acc, current-weight, existing-paths)
+      else:
+        f-node = graph.get(f)
+        start-node = graph.get(start)
+        new-edge = edge(start-node, f-node, start-node.distance(f-node) + current-weight)
+        enqueue-neighbors(start, graph, list-to-set(r), insert(new-edge, acc), current-weight, existing-paths)
+      end
   end
 end
 
@@ -160,44 +161,43 @@ fun dijkstra-helper(start :: Name, graph :: Graph, paths :: StringDict<List<Name
   end
   neighbors = current-node.neighbors
   
-  # ##############################################################################
-  # @TODO: If there are no neighbors we need to handle the next item in the queue:
-  # Will need to test this, but I think it should just work as I have it now.
-  # ##############################################################################
-
   # Place all the neighbors into the priority queue
-  # @TODO: need to update this function to not enqueue neighbors if they already have entries in paths or weights
-  updated-queue = enqueue-neighbors(start, graph, neighbors, queue, current-weight)
+  updated-queue = enqueue-neighbors(start, graph, neighbors, queue, current-weight, paths)
   
-  # Handle the minimum item from the priority queue:
-  min-item = get-min(updated-queue)
-  # @TODO: Think about this step: what happens if we already have the minimum item stored in paths and weights? We need to skip it and get the next min item.
-  #   1. Add minimum item to paths
-  previous-path = cases (Option) paths.get(min-item.place1.name):
-    | some(a) => a
-    | none => empty
-  end
-  updated-paths = paths.set(min-item.place2.name, [list: min-item.place2.name] + previous-path)
-  #   2. Add minimum item to weights
-  updated-weights = weights.set(min-item.place2.name, min-item.weight)
-  #   3. Pop the minimum item from the queue
-  updated-queue2 = remove-min(updated-queue)
-  
-  spy: updated-paths end
-  
-  spy: updated-queue2 end
-  
-  # @TODO: Process the next node. Need to recur here.
-  # @TODO: May need to consider whether we've already processed the node or not?
+  if updated-queue == mt:
+    # If there are no more items in the queue, we are done:
+    result-list = paths.keys().fold(lam(acc, key): acc + [list: paths.get-value(key)] end, empty)
+    result-set = list-to-set(result-list)
+    result-set
+  else:
+    # Handle the minimum item from the priority queue:
+    min-item = get-min(updated-queue)
     
-  empty-set
+    if paths.has-key(min-item.place2.name):
+      # If we've already processed the min item, skip it:
+      updated-queue2 = remove-min(updated-queue)
+      dijkstra-helper(start, graph, paths, weights, updated-queue2)
+    else:
+      # Process the min item:
+      previous-path = cases (Option) paths.get(min-item.place1.name):
+        | some(a) => a
+        | none => empty
+      end
+      updated-paths = paths.set(min-item.place2.name, [list: min-item.place2.name] + previous-path)
+      updated-weights = weights.set(min-item.place2.name, min-item.weight)
+      updated-queue2 = remove-min(updated-queue)
+
+      # Process the next node:
+      dijkstra-helper(min-item.place2.name, graph, updated-paths, updated-weights, updated-queue2)
+    end
+  end
 end
 
 fun dijkstra(start :: Name, graph :: Graph) -> Set<Path>:
   nodes = graph.names()
   queue = mt
   if nodes.member(start):
-    dijkstra-helper(start, graph, [string-dict: start, [list: start] ], [string-dict: start, 0 ], queue)
+    dijkstra-helper(start, graph, [string-dict: start, [list: start]], [string-dict: start, 0 ], queue)
   else:
     empty-set
   end
@@ -213,7 +213,7 @@ end
 
 check:
   dijkstra("asdfasdf", brown-university-landmarks) is empty-set
-  dijkstra("X-Waterman-Thayer", brown-university-landmarks) is [set: [list: 'X-Waterman-Thayer']]
   dijkstra("asdfasdf", g) is empty-set
   dijkstra("1", g) is [set: [list: "1"], [list: "3", "1"], [list: "2", "1"], [list: "4", "2", "1"]]
+  dijkstra("1", g1) is [list-set:[list:"5", "1"], [list:"3", "1"], [list:"4", "5", "1"], [list:"1"], [list:"2", "1"]]
 end
